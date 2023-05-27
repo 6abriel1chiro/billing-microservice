@@ -16,4 +16,7 @@ def create_app():
 
     db.init_app(app)
     with app.app_context():
+        from billing_api import billing_api_blueprint
+
+        app.register_blueprint(billing_api_blueprint)
         return app
