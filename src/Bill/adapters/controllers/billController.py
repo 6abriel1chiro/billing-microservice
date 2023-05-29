@@ -2,6 +2,8 @@
 from flask import Blueprint, request, jsonify
 from application.Services.billService import BillService
 from adapters.DTO.billDTO import BillDTO
+from adapters.DTO.userDTO import UserDTO
+
 
 billBP = Blueprint("bills", __name__)
 
@@ -9,19 +11,26 @@ billBP = Blueprint("bills", __name__)
 @billBP.route("/bills", methods=["POST"])
 def create_bill():
     data = request.get_json()
-    billDto = BillDTO(data["user_name"], data["concept"], data["ammount"], data["date"])
+    billDto = BillDTO(
+        billUserID=data["userID"],
+        billConcept=data["concept"],
+        billAmount=data["amount"],
+        billDate=data["date"],
+    )
     bill_service = BillService()
     bill = bill_service.createBill(billDto)
-    if bill:
+    if bill != 404 and bill:
         response = {
             "message": "Bill created successfully",
             "billID": bill.billID,
-            "user_name": bill.user_name,
+            "userID": bill.userID,
             "concept": bill.concept,
-            "ammount": bill.ammount,
+            "amount": bill.amount,
             "date": bill.date,
         }
         return jsonify(response), 201
+    elif bill == 404:
+        return jsonify({"message": "User not found"}), 404
     else:
         return jsonify({"message": "Failed to create bill"}), 500
 
@@ -34,9 +43,9 @@ def get_bill(billID):
     if bill:
         response = {
             "billID": bill.billID,
-            "user_name": bill.user_name,
+            "userID": bill.userID,
             "concept": bill.concept,
-            "ammount": bill.ammount,
+            "amount": bill.amount,
             "date": bill.date,
         }
         return jsonify(response), 200
@@ -45,25 +54,27 @@ def get_bill(billID):
 
 
 @billBP.route("/bills/<int:billID>", methods=["PUT"])
-def update_bill(userID):
+def update_bill(billID):
     data = request.get_json()
     billDto = BillDTO(
-        userID, data["user_name"], data["concept"], data["ammount"], data["date"]
+        billID, data["userID"], data["concept"], data["amount"], data["date"]
     )
 
     bill_service = BillService()  # Instancia del servicio de usuario
     bill = bill_service.updateBill(billDto)
 
-    if bill:
+    if bill != 404 and bill:
         response = {
             "message": "Bill updated successfully",
             "billID": bill.billID,
-            "user_name": bill.user_name,
+            "userID": bill.userID,
             "concept": bill.concept,
-            "ammount": bill.ammount,
+            "amount": bill.amount,
             "date": bill.date,
         }
         return jsonify(response), 200
+    elif bill == 404:
+        return jsonify({"message": "User not found"}), 404
     else:
         return jsonify({"message": "Bill not found"}), 404
 
@@ -76,23 +87,10 @@ def delete_bill(billID):
     return jsonify({"message": "Bill deleted successfully"}), 200
 
 
-@billBP.route("/bills/usernamechange", methods=["PUT"])
-def change_username():
-    data = request.get_json()
-    billDto = BillDTO(data["billID"], data["user_name"])
-    userDTO = BillDTO(data["userID"], data["new_user_name"])
-
+@billBP.route("/bills/deletefromuser/<int:userID>", methods=["DELETE"])
+def delete_bill_from_user(userID):
     bill_service = BillService()
-    bill = bill_service.changeUsername(billDto)
-    if bill:
-        response = {
-            "message": "Username changed successfully",
-            "billID": bill.billID,
-            "user_name": bill.user_name,
-            "concept": bill.concept,
-            "ammount": bill.ammount,
-            "date": bill.date,
-        }
-        return jsonify(response), 200
-    else:
-        return jsonify({"message": "Bill not found"}), 404
+    billDto = BillDTO(billUserID=userID)
+    bill_service.deleteBillFromUser(billDto)
+    print("TRYING TO DELETE !!!!!!!!!!")
+    return jsonify({"message": "Bill deleted successfully"}), 200

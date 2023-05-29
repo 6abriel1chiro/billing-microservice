@@ -35,8 +35,12 @@ class BillRepository:
         connection = self.__connectToDB__()
 
         cursor = connection.cursor()
-        insert_query = "INSERT INTO bill (user_name, concept,  amount, date) VALUES (%s, %s, %s, %s)"
-        values = (bill.username, bill.concept, bill.amount, bill.date)
+        insert_query = (
+            "INSERT INTO bills (userID, concept,  amount, date) VALUES (%s, %s, %s, %s)"
+        )
+        values = (bill.userID, bill.concept, bill.amount, bill.date)
+        print("!!!!!!!!!!!!!!!!!!")
+        print(insert_query, values)
         cursor.execute(insert_query, values)
         billID = cursor.lastrowid
         bill.billID = billID
@@ -50,24 +54,24 @@ class BillRepository:
 
         cursor = connection.cursor()
         select_query = (
-            "SELECT user_name, concept, amount, date FROM bill WHERE billID = %s"
+            "SELECT userID, concept, amount, date FROM bills WHERE billID = %s"
         )
         cursor.execute(select_query, (billID,))
         result = cursor.fetchone()
         cursor.close()
         connection.close()
         if result:
-            username, concept, amount, date = result
-            return Bill(billID, username, concept, amount, date)
+            userID, concept, amount, date = result
+            return Bill(billID, userID, concept, amount, date)
         return None
 
     def update(self, bill: Bill) -> Bill:
         connection = self.__connectToDB__()
 
         cursor = connection.cursor()
-        update_query = "UPDATE bill SET user_name = %s, concept = %s, amount = %s, date = %s WHERE billID = %s"
+        update_query = "UPDATE bills SET userID = %s, concept = %s, amount = %s, date = %s WHERE billID = %s"
         values = (
-            bill.username,
+            bill.userID,
             bill.concept,
             bill.amount,
             bill.date,
@@ -85,8 +89,20 @@ class BillRepository:
         connection = self.__connectToDB__()
 
         cursor = connection.cursor()
-        delete_query = "DELETE FROM bill WHERE billID = %s"
+        delete_query = "DELETE FROM bills WHERE billID = %s"
         cursor.execute(delete_query, (billID,))
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+    def deletefromuser(self, userID: int) -> None:
+        connection = self.__connectToDB__()
+        print("!!!!!!!!!!!!!!")
+        print(userID)
+
+        cursor = connection.cursor()
+        delete_query = "DELETE FROM bills WHERE userID = %s"
+        cursor.execute(delete_query, (userID,))
         connection.commit()
         cursor.close()
         connection.close()

@@ -2,13 +2,13 @@ class BillDTO:
     def __init__(
         self,
         billID=None,
-        billUserName=None,
+        billUserID=None,
         billConcept=None,
         billAmount=None,
         billDate=None,
     ):
         self.billID = billID
-        self.billUserName = billUserName
+        self.billUserID = billUserID
         self.billConcept = billConcept
         self.billAmount = billAmount
         self.billDate = billDate
@@ -16,7 +16,7 @@ class BillDTO:
     @staticmethod
     def fromEntity(bill):
         return BillDTO(
-            billUserName=bill.billUserName,
+            billUserID=bill.billUserID,
             billConcept=bill.billConcept,
             billAmount=bill.billAmount,
             billDate=bill.billDate,

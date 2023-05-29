@@ -29,3 +29,6 @@ class CrudBillCase:
 
     def deleteBill(self, billID: int) -> None:
         self.BillRepository.delete(billID)
+
+    def deleteBillFromUser(self, billUserID: int) -> None:
+        self.BillRepository.deletefromuser(billUserID)

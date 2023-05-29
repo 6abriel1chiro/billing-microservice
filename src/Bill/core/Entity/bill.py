@@ -1,10 +1,10 @@
 class Bill:
-    def __init__(self, billID, username, concept, ammount, date):
+    def __init__(self, billID, userID, concept, amount, date):
         self.billID = billID
-        self.username = username
+        self.userID = userID
         self.concept = concept
-        self.ammount = ammount
+        self.amount = amount
         self.date = date
 
     def __repr__(self):
-        return f"Bill(id={self.billID}, username='{self.username}', concept='{self.concept}', ammount={self.ammount}, date='{self.date}')"
+        return f"Bill(id={self.billID}, userID='{self.userID}', concept='{self.concept}', amount={self.amount}, date='{self.date}')"
